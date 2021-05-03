@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import { useState } from 'react'
 import styles from '../styles/Home.module.css'
-import { modEasy, bestMove } from './bots'
+import { modEasy, bestMove } from '../lib/bots'
 
 export default function Home() {
   const [ velhaArray, setVelhaArray ] = useState(Array(9).fill("")) //Estado para renderização
