@@ -1,0 +1,226 @@
+import Head from 'next/head'
+import { useState } from 'react'
+import styles from '../styles/Home.module.css'
+import { modEasy, bestMove } from './bots'
+
+export default function Home() {
+  const [ velhaArray, setVelhaArray ] = useState(Array(9).fill("")) //Estado para renderização
+  const [ velhaLista, setVelhaLista ] = useState([[0,1,2],[3,4,5],[6,7,8]]) //Estado do jogo como matriz
+  const [ move, setMove ] = useState([1,2,3,4,5,6,7,8,9])
+  const [ mark, setMark ] = useState('X') //Estado que salva marcação da jogada iniciando com X
+  const [ resultGame, setResulGame ] = useState(false)
+  const [ indexMov, setIndexMov ] = useState(0)
+
+  const [ playerName, setPlayername ] = useState('')
+  const [ difficulty, setDifficulty ] = useState('easy')
+  const [ playerMark, setPlayerMark ] = useState('X')
+  const [ iaMark, setIaMark ] = useState('O')
+
+  //Variaveis auxiliares do estado
+  var velhaCurrent = [...velhaArray]
+  var moveCurrent = [...move]
+  var resultCurrent = resultGame
+  var markCurrent = mark
+  var indexMove = indexMov
+
+  //Função que verifica condição de vitória ou condição 'velha' (nenhum ganhador)
+  const isWiner = () => {
+    //Verifica se ouvi vitória em linha
+    velhaLista.forEach(l => {
+      if (l[0] === l[1] && l[1] ===l[2]) {
+        setResulGame('Ganhou em linha')
+        resultCurrent = true
+      }
+    })
+    //Verifica se ouvi vitória nas colunas
+    for (let c = 0; c < velhaLista.length; c++) {
+      if (velhaLista[0][c] === velhaLista[1][c] && velhaLista[1][c] === velhaLista[2][c]) {
+        setResulGame('Ganhou em coluna')
+        resultCurrent = true
+      } 
+    }
+    //Verifica se ganhou nas diagonais
+    if (velhaLista[0][0] === velhaLista[1][1] && velhaLista[1][1] === velhaLista[2][2]) {
+      setResulGame('Ganhou em Diagonal')
+      resultCurrent = true
+    }
+    if (velhaLista[2][0] === velhaLista[1][1] && velhaLista[1][1] === velhaLista[0][2]) {
+      setResulGame('Ganhou em Diagonal')
+      resultCurrent = true
+    }
+    //Verificando se ninguem ganhou
+    if (!resultCurrent) {
+      if(velhaCurrent.every( value => value !== '')) {
+        setResulGame('Deu velha')
+        resultCurrent = true
+      }
+    }
+  }
+
+  //Função referente a jogada, recebe o index do array de estado de renderização
+  const play = i => {
+    //Verifica se indice já foi preenchido, ou seja diferente de '' (vazio), retornando nullo caso true
+    if(velhaArray[i] !== '' || resultCurrent) return null
+
+    //Seta o valor da marcação jogada no array de renderização
+    velhaCurrent[i] = markCurrent
+
+    indexMove++
+
+    moveCurrent.splice(moveCurrent.indexOf(i+1),1)
+
+    //Percorre matriz da velha e seta valor da jogada na posição correspondente
+    for (let l = 0; l < velhaLista.length; l++) {
+      for (let c = 0; c < velhaLista[l].length; c++) {
+        if (velhaLista[l][c] === i){
+          velhaLista[l][c] = markCurrent
+        }
+      }
+    }
+
+    //Chamando função de verificação de vitória
+    isWiner()
+
+    //Altera valor da marcação se não houver ganhador
+    if (!resultCurrent) {
+      markCurrent = markCurrent === 'X' ? 'O' : 'X'
+    }
+
+    //Verifica se a marcação está diferente do jogador e chamanda jogada do bot(IA)
+    if (playerMark !== markCurrent) {
+      play(moveBot())
+    }
+    setIndexMov(indexMove)
+    setMark(markCurrent)
+    setMove(moveCurrent)
+    setVelhaArray(velhaCurrent)
+  }
+
+  const moveBot = () => {
+    let indexVelharArray
+
+    switch (difficulty) {
+      case "easy":
+        indexVelharArray = modEasy(moveCurrent) //Chamando função que calcula posição no modo fácil
+        break
+
+      case "normal":
+        //Chamando função que calcula posição no modo Normal
+        indexVelharArray = bestMove(velhaLista, indexMove, 6, playerMark, iaMark) 
+        break
+
+      case "hard":
+        //Chamando função que calcula posição no modo difícil
+        indexVelharArray = bestMove(velhaLista, indexMove, 9, playerMark, iaMark) 
+        break
+
+      default:
+        break
+    }
+
+    return indexVelharArray
+  }
+
+  //Função que inicia jogo, fechando modal inicial
+  const startGame = () => {
+    if (playerName === '') return alert('Prencha seu nome!')
+
+    document.querySelector('#modal-startGame').style.display = 'none'
+
+    alert('Boa sorte!')
+
+    playerMark !== 'X' ? play(moveBot()) : null
+  }
+
+  const changeMark = playMark => {
+    playMark === 'n' ? setPlayerMark('O') : setPlayerMark('X')
+    playMark === 'n' ? setIaMark('X') : setIaMark('O')
+  }
+
+  //Função que restaura estados originais para reniciar o jogo
+  const restart = () => {
+    setVelhaArray(Array(9).fill(""))
+    setVelhaLista([[0,1,2],[3,4,5],[6,7,8]])
+    setMove([1,2,3,4,5,6,7,8,9])
+    setMark('X')
+    setResulGame(false)
+    setIndexMov(0)
+    document.querySelector('#modal-startGame').style.display = 'flex'
+  }
+
+  return (
+    <div className={styles.container}>
+      <Head>
+        <title>Jogo da Velha</title>
+        <meta name="description" content="Generated by create next app" />
+      </Head>
+
+      <main className={styles.main}>
+        <h1># Jogo da velha #</h1>
+        <span>Projeto para AVQualis de Estrutura Avançada de Dados</span>
+
+        <div className={styles.tab}>
+          {velhaArray.map(( item, i ) => (
+            <div
+              className={styles.field}
+              key={i}
+              onClick={() => play(i)}
+            >{item}</div>
+            ))}
+        </div>
+        <br/>
+        <button className={styles.btn} onClick={restart}>Resetar</button>
+        {resultGame &&
+          <div className={styles.modal}>
+            <div className={styles.modalContent}>
+              {resultCurrent !== 'Deu velha' ?
+                <p className={mark !== playerMark ? styles.iaWin : styles.playerWin}>
+                  {mark !== playerMark ? 'Computador' : playerName} {resultGame} com {mark}
+                </p>
+              : 
+                <p className={styles.iaWin}>
+                  Jogo deu velha!
+                </p>
+              }
+              <button onClick={restart}>Jogar novamente</button>
+            </div>
+          </div>
+        }
+      </main>
+      
+      <div className={styles.modal} id="modal-startGame">
+        <div className={styles.modalContent}>
+          <h2>Bem vindo ao jogo da velha!</h2>
+          
+          <label htmlFor="playName">Digite seu nome abaixo, selecione uma dificuldade e click em START para iniciar.</label>
+          <input
+            type="text"
+            id="playName"
+            placeholder="Digite seu nome"
+            onChange={e => setPlayername(e.target.value)}
+            required
+          />
+
+          <div className={styles.diff}>
+            <label htmlFor="idDiff">Selecione a dificuldade: </label>
+            <select name="difficulty" id="idDiff" onChange={e => setDifficulty(e.target.value)}>
+              <option value="easy">Fácil</option>
+              <option value="normal">Médio</option>
+              <option value="hard">Dificil</option>
+            </select>
+          </div>
+
+          <div className={styles.diff}>
+            <label htmlFor="idPlayMark">Deseja iniciar jogando? </label>
+            <select name="playmark" id="idPlayMark" onChange={e => changeMark(e.target.value)}>
+              <option value="s">Sim</option>
+              <option value="n">Não</option>
+            </select>
+          </div>
+          
+          <button onClick={startGame}>START GAME</button>
+        </div>
+      </div>
+    </div>
+  )
+}

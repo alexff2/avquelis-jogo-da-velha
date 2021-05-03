@@ -1,0 +1,128 @@
+.container {
+  min-height: 100vh;
+  padding: 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.main {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.main h1 {
+  text-align: center;
+  font-size: 3rem;
+  color: #0E87CC;
+  margin-bottom: 0.5rem;
+}
+.main span {
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  display: grid;
+  grid-template-columns: repeat(3, 10rem);
+  grid-template-rows: repeat(3, 10rem);
+  gap: 1rem;
+}
+
+.field {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+
+  background-color: #016795;
+  border-radius: 0.25rem;
+  font-size: 5rem;
+  font-weight: 800;
+  color: white;
+  cursor: pointer;
+}
+
+.field:hover {
+  box-shadow: 0 0 0.5rem;
+  height: 10.5rem;
+  width: 10.5rem;
+}
+
+.iaWin {
+  margin-bottom: 1rem;
+  color: #FF6163;
+}
+.playerWin {
+  margin-bottom: 1rem;
+  color: #017371;
+}
+/* Style Modals =================*/
+.modal {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalContent {
+  background-color: white;
+  padding: 2rem;
+  width: 300px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.modalContent h2 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.modalContent label {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.modalContent input {
+  margin-bottom: 1rem;
+  width: 100%;
+  padding: 0.6rem 0.5rem;
+  border-radius: 0.25rem;
+  border: solid 1px black;
+}
+
+.modalContent button, .btn {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #017371;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  transition: all 0.6s;
+}
+
+.btn {
+  width: auto;
+}
+
+
+.modalContent button:hover, .btn {
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+/*Specific style modal =================*/
+.diff {
+  margin-bottom: 1rem;
+}
